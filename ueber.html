@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Über Mich | Wolfgang Nell</title>
+    <meta name="description" content=""> <!-- Wird von JS befüllt -->
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="preloader">WN</div>
+    <div class="cursor-spotlight"></div>
+    <header>
+        <div class="logo"><a href="index.html">WN</a></div>
+        <ul class="nav-links">
+            <li><a href="ueber.html">Über Mich</a></li>
+            <li><a href="index.html#projekte">Projekte</a></li>
+            <li><a href="alter-ego.html">Alter Ego</a></li>
+            <li><a href="aktuelles.html">Aktuelles</a></li>
+        </ul>
+        <div class="burger">
+            <div class="line1"></div><div class="line2"></div><div class="line3"></div>
+        </div>
+    </header>
+
+    <main id="ueber-content" class="page-container reveal">
+        <div class="loader"></div>
+    </main>
+
+    <script src="script.js"></script>
+    <script type="module">
+        import client from './sanity-client.js';
+        import imageUrlBuilder from 'https://cdn.skypack.dev/@sanity/image-url';
+        // NEU: Wir brauchen einen Helfer, um den formatierten Text aus Sanity in HTML umzuwandeln
+        import {toHTML} from 'https://cdn.skypack.dev/@portabletext/to-html';
+
+        const builder = imageUrlBuilder(client);
+        function urlFor(source) { return builder.image(source) }
+
+        function setSeoTags(seo, fallbackTitle) {
+            document.title = seo?.metaTitle || `${fallbackTitle} | Wolfgang Nell`;
+            let descriptionTag = document.querySelector('meta[name="description"]');
+            if (!descriptionTag) {
+                descriptionTag = document.createElement('meta');
+                descriptionTag.name = 'description';
+                document.head.appendChild(descriptionTag);
+            }
+            descriptionTag.content = seo?.metaDescription || '';
+        }
+
+        async function displayUeberPage() {
+            const container = document.getElementById('ueber-content');
+            // Holt den EINEN Eintrag vom Typ "ueberPage" und auch die SEO-Daten
+            const query = `*[_type == "ueberPage"][0]{..., seo}`; 
+            
+            try {
+                const page = await client.fetch(query);
+
+                if (page) {
+                    setSeoTags(page.seo, page.title || 'Über Mich');
+                    
+                    // Prüfe, ob ein Bild vorhanden ist
+                        const imageUrl = page.profileImage ? urlFor(page.profileImage).width(600).auto('format').url() : '';
+                        const imageHtml = imageUrl ? `<img src="${imageUrl}" alt="Porträt von Wolfgang Nell">` : '';
+
+                        container.innerHTML = `
+                            <h2>${page.title}</h2>
+                            <div class="ueber-container">
+                                ${imageHtml}
+                                <div class="ueber-text">
+                                    ${toHTML(page.bio)}
+                                </div>
+                            </div>
+                        `;
+                    container.classList.add('is-visible');
+                } else {
+                    container.innerHTML = "<h2>Inhalte nicht gefunden</h2><p>Die 'Über Mich'-Seite wurde im CMS noch nicht erstellt.</p>";
+                }
+            } catch(error) {
+                container.innerHTML = '<p style="color:red;">Fehler beim Laden der Seite.</p>';
+                console.error(error);
+            }
+        }
+        displayUeberPage();
+    </script>
+<!-- ... (dein main und script-Tag) ... -->
+    <footer>
+        &copy; 2024 Wolfgang Nell | <a href="impressum.html">Impressum</a> | <a href="datenschutz.html">Datenschutz</a>
+    </footer>
+</body>
+</html>

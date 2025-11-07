@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lade Eintrag...</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="preloader">WN</div>
+    <div class="cursor-spotlight"></div>
+    <header>
+        <div class="logo"><a href="index.html">WN</a></div>
+        <ul class="nav-links">
+            <li><a href="ueber.html">Über Mich</a></li>
+            <li><a href="index.html#projekte">Projekte</a></li>
+            <li><a href="alter-ego.html">Alter Ego</a></li>
+            <li><a href="aktuelles.html">Aktuelles</a></li>
+        </ul>
+        <div class="burger">
+            <div class="line1"></div><div class="line2"></div><div class="line3"></div>
+        </div>
+    </header>
+
+    <main id="post-container" class="page-container reveal">
+        <p style="text-align: center; color: var(--grey);">Lade Eintrag...</p>
+    </main>
+    
+    <script src="script.js"></script>
+    <script type="module">
+      import client from './sanity-client.js';
+      import imageUrlBuilder from 'https://cdn.skypack.dev/@sanity/image-url';
+      import {toHTML} from 'https://cdn.skypack.dev/@portabletext/to-html';
+      
+      const builder = imageUrlBuilder(client);
+      function urlFor(source) { return builder.image(source) }
+
+      async function displayPostDetails() {
+        const container = document.getElementById('post-container');
+        const params = new URLSearchParams(window.location.search);
+        const slug = params.get('slug');
+
+        if (!slug) { container.innerHTML = '<h2>Fehler</h2><p>Kein Eintrag ausgewählt.</p>'; return; }
+
+        const query = `*[_type == "post" && slug.current == $slug][0]`;
+        const post = await client.fetch(query, { slug: slug });
+
+        if (post) {
+            document.title = `${post.title} | Wolfgang Nell`;
+            const date = new Date(post.publishedAt).toLocaleString('de-DE', { year: 'numeric', month: 'long', day: 'numeric' });
+
+            container.innerHTML = `
+                <div class="blog-post-detail">
+                    <time datetime="${post.publishedAt}">${date}</time>
+                    <h1>${post.title}</h1>
+                    <div class="blog-post-body">${toHTML(post.body, {
+                        components: {
+                            types: {
+                                image: ({value}) => `<img src="${urlFor(value).width(800).auto('format').url()}" />`
+                            }
+                        }
+                    })}</div>
+                    <a href="${post.category === 'aktuelles' ? 'aktuelles.html' : 'alter-ego.html'}" class="back-link">← Zurück zur Übersicht</a>
+                </div>
+            `;
+            container.classList.add('is-visible');
+        } else {
+            container.innerHTML = '<h2>Eintrag nicht gefunden</h2>';
+        }
+      }
+      displayPostDetails();
+    </script>
+</body>
+</html>

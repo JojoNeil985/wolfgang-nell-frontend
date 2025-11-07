@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lade Kunstwerk...</title>
+    <meta name="description" content=""> <!-- Wird von JavaScript befüllt -->
+    
+    <!-- FANCYBOX für den Bild-Zoom -->
+    <script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui@5.0/dist/fancybox/fancybox.umd.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui@5.0/dist/fancybox/fancybox.css" />
+    
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="preloader">WN</div>
+    <div class="cursor-spotlight"></div>
+    <header>
+        <div class="logo"><a href="index.html">WN</a></div>
+        <ul class="nav-links">
+            <li><a href="ueber.html">Über Mich</a></li>
+            <li><a href="index.html#projekte">Projekte</a></li>
+            <li><a href="alter-ego.html">Alter Ego</a></li>
+            <li><a href="aktuelles.html">Aktuelles</a></li>
+        </ul>
+        <div class="burger">
+            <div class="line1"></div><div class="line2"></div><div class="line3"></div>
+        </div>
+    </header>
+
+    <main id="artwork-container" class="page-container reveal">
+        <div class="loader"></div>
+    </main>
+    
+    <script src="script.js"></script>
+    <script type="module">
+      import client from './sanity-client.js';
+      import imageUrlBuilder from 'https://cdn.skypack.dev/@sanity/image-url';
+
+      const builder = imageUrlBuilder(client);
+      function urlFor(source) { return builder.image(source) }
+
+      function setSeoTags(seo, fallbackTitle, fallbackDesc) {
+          document.title = seo?.metaTitle || `${fallbackTitle} | Wolfgang Nell`;
+          
+          let descriptionTag = document.querySelector('meta[name="description"]');
+          if (!descriptionTag) {
+              descriptionTag = document.createElement('meta');
+              descriptionTag.name = 'description';
+              document.head.appendChild(descriptionTag);
+          }
+          descriptionTag.content = seo?.metaDescription || fallbackDesc;
+          
+          if (seo?.socialImage) {
+            let socialImageTag = document.querySelector('meta[property="og:image"]');
+            if (!socialImageTag) {
+                socialImageTag = document.createElement('meta');
+                socialImageTag.setAttribute('property', 'og:image');
+                document.head.appendChild(socialImageTag);
+            }
+            socialImageTag.content = urlFor(seo.socialImage).url();
+          }
+      }
+
+      async function fetchArtworkDetails() {
+        const container = document.getElementById('artwork-container');
+        const slug = new URLSearchParams(window.location.search).get('slug');
+
+        if (!slug) { 
+            container.innerHTML = '<h2>Kunstwerk nicht gefunden.</h2><p>Es wurde kein Kunstwerk in der URL angegeben.</p>'; 
+            return; 
+        }
+
+        const query = `*[_type == "artwork" && slug.current == $slug][0]{..., seo}`;
+        
+        try {
+            const artwork = await client.fetch(query, { slug });
+
+            if (artwork) {
+              setSeoTags(artwork.seo, artwork.title, artwork.poem || `Ein Kunstwerk von Wolfgang Nell namens ${artwork.title}.`);
+              
+              const statusMap = {'available': 'Erhältlich', 'sold': 'Verkauft', 'on-request': 'Auf Anfrage'};
+              const statusText = artwork.status ? statusMap[artwork.status] : '';
+              const statusClass = artwork.status || '';
+
+              container.innerHTML = `
+                <div class="artwork-detail-container">
+                  <div class="artwork-image">
+                    <a href="${urlFor(artwork.mainImage).url()}" data-fancybox data-caption="${artwork.title}">
+                      <img src="${urlFor(artwork.mainImage).width(1200).auto('format').url()}" alt="${artwork.title}" style="cursor: zoom-in;">
+                    </a>
+                  </div>
+                  <div class="artwork-info">
+                    <h1>${artwork.title}</h1>
+                    <div class="artwork-meta">
+                      <p><strong>Status:</strong> <span class="status-label ${statusClass}">${statusText}</span></p>
+                      <p><strong>Technik:</strong> ${artwork.technique || 'N/A'}</p>
+                      <p><strong>Jahr:</strong> ${artwork.year || 'N/A'}</p>
+                      <p><strong>Maße:</strong> ${artwork.dimensions || 'N/A'}</p>
+                    </div>
+                    <blockquote class="artwork-poem">${artwork.poem ? artwork.poem.replace(/\n/g, '<br>') : ''}</blockquote>
+                    <a href="index.html#projekte" class="back-link">← Zurück zur Übersicht</a>
+                  </div>
+                </div>
+              `;
+              container.classList.add('is-visible');
+              Fancybox.bind("[data-fancybox]");
+            } else {
+              container.innerHTML = `<h2>Kunstwerk nicht gefunden.</h2><p>Es wurde kein Kunstwerk mit dem Link "${slug}" gefunden.</p>`;
+            }
+        } catch(error) {
+            container.innerHTML = '<p style="color:red;">Fehler beim Laden des Kunstwerks. Ist das Backend (Sanity) erreichbar und der CORS-Eintrag korrekt?</p>';
+            console.error(error);
+        }
+      }
+      fetchArtworkDetails();
+    </script>
+<!-- ... (dein main und script-Tag) ... -->
+    <footer>
+        &copy; 2024 Wolfgang Nell | <a href="impressum.html">Impressum</a> | <a href="datenschutz.html">Datenschutz</a>
+    </footer>
+</body>
+</html>
