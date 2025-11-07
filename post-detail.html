@@ -4,27 +4,39 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Lade Eintrag...</title>
+    <meta name="description" content="">
+    
+    <script src="https://unpkg.com/@barba/core" defer></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js" defer></script>
+    
     <link rel="stylesheet" href="style.css">
 </head>
-<body>
+<body data-barba="wrapper">
     <div class="preloader">WN</div>
     <div class="cursor-spotlight"></div>
-    <header>
-        <div class="logo"><a href="index.html">WN</a></div>
-        <ul class="nav-links">
-            <li><a href="ueber.html">Über Mich</a></li>
-            <li><a href="index.html#projekte">Projekte</a></li>
-            <li><a href="alter-ego.html">Alter Ego</a></li>
-            <li><a href="aktuelles.html">Aktuelles</a></li>
-        </ul>
-        <div class="burger">
-            <div class="line1"></div><div class="line2"></div><div class="line3"></div>
-        </div>
-    </header>
 
-    <main id="post-container" class="page-container reveal">
-        <p style="text-align: center; color: var(--grey);">Lade Eintrag...</p>
-    </main>
+    <div data-barba="container" data-barba-namespace="post-detail">
+        <header>
+            <div class="logo"><a href="index.html">WN</a></div>
+            <ul class="nav-links">
+                <li><a href="ueber.html">Über Mich</a></li>
+                <li><a href="index.html#projekte">Projekte</a></li>
+                <li><a href="alter-ego.html">Alter Ego</a></li>
+                <li><a href="aktuelles.html">Aktuelles</a></li>
+            </ul>
+            <div class="burger">
+                <div class="line1"></div><div class="line2"></div><div class="line3"></div>
+            </div>
+        </header>
+
+        <main id="post-container" class="page-container">
+            <div class="loader"></div>
+        </main>
+        
+        <footer>
+            &copy; 2024 Wolfgang Nell | <a href="impressum.html">Impressum</a> | <a href="datenschutz.html">Datenschutz</a>
+        </footer>
+    </div>
     
     <script src="script.js"></script>
     <script type="module">
@@ -35,40 +47,50 @@
       const builder = imageUrlBuilder(client);
       function urlFor(source) { return builder.image(source) }
 
+      function setSeoTags(seo, fallbackTitle) {
+          document.title = seo?.metaTitle || `${fallbackTitle} | Wolfgang Nell`;
+          document.querySelector('meta[name="description"]').content = seo?.metaDescription || '';
+      }
+
       async function displayPostDetails() {
         const container = document.getElementById('post-container');
-        const params = new URLSearchParams(window.location.search);
-        const slug = params.get('slug');
+        const slug = new URLSearchParams(window.location.search).get('slug');
 
         if (!slug) { container.innerHTML = '<h2>Fehler</h2><p>Kein Eintrag ausgewählt.</p>'; return; }
 
-        const query = `*[_type == "post" && slug.current == $slug][0]`;
-        const post = await client.fetch(query, { slug: slug });
+        const query = `*[_type == "post" && slug.current == $slug][0]{..., seo}`;
+        
+        try {
+            const post = await client.fetch(query, { slug: slug });
 
-        if (post) {
-            document.title = `${post.title} | Wolfgang Nell`;
-            const date = new Date(post.publishedAt).toLocaleString('de-DE', { year: 'numeric', month: 'long', day: 'numeric' });
+            if (post) {
+                setSeoTags(post.seo, post.title);
+                const date = new Date(post.publishedAt).toLocaleString('de-DE', { year: 'numeric', month: 'long', day: 'numeric' });
 
-            container.innerHTML = `
-                <div class="blog-post-detail">
-                    <time datetime="${post.publishedAt}">${date}</time>
-                    <h1>${post.title}</h1>
-                    <div class="blog-post-body">${toHTML(post.body, {
-                        components: {
-                            types: {
-                                image: ({value}) => `<img src="${urlFor(value).width(800).auto('format').url()}" />`
+                container.innerHTML = `
+                    <div class="blog-post-detail">
+                        <time datetime="${post.publishedAt}">${date}</time>
+                        <h1>${post.title}</h1>
+                        <div class="blog-post-body">${toHTML(post.body, {
+                            components: {
+                                types: {
+                                    image: ({value}) => `<img src="${urlFor(value).width(800).auto('format').url()}" />`
+                                }
                             }
-                        }
-                    })}</div>
-                    <a href="${post.category === 'aktuelles' ? 'aktuelles.html' : 'alter-ego.html'}" class="back-link">← Zurück zur Übersicht</a>
-                </div>
-            `;
-            container.classList.add('is-visible');
-        } else {
-            container.innerHTML = '<h2>Eintrag nicht gefunden</h2>';
+                        })}</div>
+                        <a href="${post.category === 'aktuelles' ? 'aktuelles.html' : 'alter-ego.html'}" class="back-link">← Zurück zur Übersicht</a>
+                    </div>
+                `;
+            } else {
+                container.innerHTML = '<h2>Eintrag nicht gefunden</h2>';
+            }
+        } catch (error) {
+            container.innerHTML = '<p style="color:red;">Fehler beim Laden des Eintrags.</p>';
+            console.error(error);
         }
       }
       displayPostDetails();
     </script>
+    <script src="transitions.js"></script>
 </body>
 </html>

@@ -4,30 +4,42 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Aktuelles | Wolfgang Nell</title>
+    <meta name="description" content="Aktuelle Ankündigungen, Ausstellungen und Neuigkeiten von Künstler Wolfgang Nell.">
+    
+    <script src="https://unpkg.com/@barba/core" defer></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js" defer></script>
+    
     <link rel="stylesheet" href="style.css">
 </head>
-<body>
+<body data-barba="wrapper">
     <div class="preloader">WN</div>
     <div class="cursor-spotlight"></div>
-    <header>
-        <div class="logo"><a href="index.html">WN</a></div>
-        <ul class="nav-links">
-            <li><a href="ueber.html">Über Mich</a></li>
-            <li><a href="index.html#projekte">Projekte</a></li>
-            <li><a href="alter-ego.html">Alter Ego</a></li>
-            <li><a href="aktuelles.html">Aktuelles</a></li>
-        </ul>
-        <div class="burger">
-            <div class="line1"></div><div class="line2"></div><div class="line3"></div>
-        </div>
-    </header>
 
-    <main class="page-container reveal">
-        <h2>Aktuelles</h2>
-        <div id="blog-list" class="blog-list-container">
-            <div class="loader"></div>
-        </div>
-    </main>
+    <div data-barba="container" data-barba-namespace="aktuelles">
+        <header>
+            <div class="logo"><a href="index.html">WN</a></div>
+            <ul class="nav-links">
+                <li><a href="ueber.html">Über Mich</a></li>
+                <li><a href="index.html#projekte">Projekte</a></li>
+                <li><a href="alter-ego.html">Alter Ego</a></li>
+                <li><a href="aktuelles.html">Aktuelles</a></li>
+            </ul>
+            <div class="burger">
+                <div class="line1"></div><div class="line2"></div><div class="line3"></div>
+            </div>
+        </header>
+
+        <main class="page-container">
+            <h2>Aktuelles</h2>
+            <div id="blog-list" class="blog-list-container">
+                <div class="loader"></div>
+            </div>
+        </main>
+
+        <footer>
+            &copy; 2024 Wolfgang Nell | <a href="impressum.html">Impressum</a> | <a href="datenschutz.html">Datenschutz</a>
+        </footer>
+    </div>
 
     <script src="script.js"></script>
     <script type="module">
@@ -40,30 +52,37 @@
                 publishedAt,
                 "slug": slug.current
             }`;
-            const posts = await client.fetch(query);
+            
+            try {
+                const posts = await client.fetch(query);
 
-            if (posts.length > 0) {
-                container.innerHTML = '';
-                posts.forEach(post => {
-                    const postLink = document.createElement('a');
-                    postLink.href = `post-detail.html?slug=${post.slug}`;
-                    postLink.className = 'blog-post-link'; // Neue Klasse für Styling
-                    
-                    const date = new Date(post.publishedAt).toLocaleDateString('de-DE', { year: 'numeric', month: 'long', day: 'numeric' });
-                    
-                    postLink.innerHTML = `
-                        <article class="blog-post">
-                            <time datetime="${post.publishedAt}">${date}</time>
-                            <h3>${post.title}</h3>
-                        </article>
-                    `;
-                    container.appendChild(postLink);
-                });
-            } else {
-                container.innerHTML = '<p>Keine aktuellen Einträge gefunden.</p>';
+                if (posts && posts.length > 0) {
+                    container.innerHTML = '';
+                    posts.forEach(post => {
+                        const postLink = document.createElement('a');
+                        postLink.href = `post-detail.html?slug=${post.slug}`;
+                        postLink.className = 'blog-post-link';
+                        
+                        const date = new Date(post.publishedAt).toLocaleDateString('de-DE', { year: 'numeric', month: 'long', day: 'numeric' });
+                        
+                        postLink.innerHTML = `
+                            <article class="blog-post">
+                                <time datetime="${post.publishedAt}">${date}</time>
+                                <h3>${post.title}</h3>
+                            </article>
+                        `;
+                        container.appendChild(postLink);
+                    });
+                } else {
+                    container.innerHTML = '<p>Keine aktuellen Einträge gefunden.</p>';
+                }
+            } catch (error) {
+                container.innerHTML = '<p style="color:red;">Fehler beim Laden der Einträge.</p>';
+                console.error(error);
             }
         }
         displayPosts();
     </script>
+    <script src="transitions.js"></script>
 </body>
 </html>

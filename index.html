@@ -5,88 +5,87 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Wolfgang Nell | Künstler</title>
     <meta name="description" content="Portfolio und Projekte des Künstlers und Autors Wolfgang Nell. Entdecken Sie detailreiche Zeichnungen und die Vision hinter seinem Werk.">
-    <!-- Social Media Tags (werden später dynamisch für Detailseiten) -->
-    <meta property="og:title" content="Wolfgang Nell | Künstler">
-    <meta property="og:description" content="Portfolio und Projekte des Künstlers und Autors Wolfgang Nell.">
-    <!-- Hier könnte ein allgemeines Vorschaubild für die Startseite hin -->
-    <!-- <meta property="og:image" content="URL_ZUM_BILD"> -->
+    
+    <!-- Bibliotheken für Page Transitions -->
+    <script src="https://unpkg.com/@barba/core" defer></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js" defer></script>
+    
     <link rel="stylesheet" href="style.css">
 </head>
-<body>
+<body data-barba="wrapper">
     <div class="preloader">WN</div>
     <div class="cursor-spotlight"></div>
-    <header>
-        <div class="logo"><a href="index.html">WN</a></div>
-        <ul class="nav-links">
-            <li><a href="ueber.html">Über Mich</a></li>
-            <li><a href="#projekte">Projekte</a></li>
-            <li><a href="alter-ego.html">Alter Ego</a></li>
-            <li><a href="aktuelles.html">Aktuelles</a></li>
-        </ul>
-        <div class="burger">
-            <div class="line1"></div><div class="line2"></div><div class="line3"></div>
-        </div>
-    </header>
 
-    <main>
-        <section id="start">
-            <div class="start-title">
-                <h1>Wolfgang Nell</h1>
-                <p>Künstler & Autor</p>
+    <div data-barba="container" data-barba-namespace="home">
+        <header>
+            <div class="logo"><a href="index.html">WN</a></div>
+            <ul class="nav-links">
+                <li><a href="ueber.html">Über Mich</a></li>
+                <li><a href="#projekte" data-barba-prevent>Projekte</a></li> 
+                <li><a href="alter-ego.html">Alter Ego</a></li>
+                <li><a href="aktuelles.html">Aktuelles</a></li>
+            </ul>
+            <div class="burger">
+                <div class="line1"></div><div class="line2"></div><div class="line3"></div>
             </div>
-        </section>
+        </header>
 
-        <section id="projekt-vision">
-            <div class="container vision-container">
-                <div class="counter-container reveal">
-                    <h2 id="figure-counter">...</h2>
-                    <p>GEZEICHNETE FIGUREN</p>
+        <main>
+            <section id="start">
+                <div class="start-title">
+                    <h1>Wolfgang Nell</h1>
+                    <p>Künstler & Autor</p>
                 </div>
-                <div class="vision-text reveal">
-                    <h2>Die Vision</h2>
-                    <p>Hinter der Kunst steht die Mission, einer unvorstellbaren Zahl eine sichtbare Form zu geben: Ein Lebensprojekt als stilles Gedenken an die 7 Millionen Opfer des Holocaust.</p>
+            </section>
+
+            <section id="projekt-vision">
+                <div class="container vision-container">
+                    <div class="counter-container reveal">
+                        <h2 id="figure-counter">...</h2>
+                        <p>GEZEICHNETE FIGUREN</p>
+                    </div>
+                    <div class="vision-text reveal">
+                        <h2>Die Vision</h2>
+                        <p>Hinter der Kunst steht die Mission, einer unvorstellbaren Zahl eine sichtbare Form zu geben: Ein Lebensprojekt als stilles Gedenken an die 7 Millionen Opfer des Holocaust.</p>
+                    </div>
                 </div>
-            </div>
-        </section>
+            </section>
+            
+            <section id="projekte">
+                <div class="container reveal">
+                    <h2>Ausgewählte Projekte</h2>
+                    <div class="project-grid">
+                        <div class="loader"></div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="kontakt">
+                <div class="container reveal">
+                    <h2>Kontakt</h2>
+                    <form id="contact-form" action="https://formspree.io/f/mldarrjv" method="POST">
+                        <div class="form-group">
+                            <input type="text" id="name" name="name" class="form-input" placeholder=" " required>
+                            <label for="name" class="form-label">Name</label>
+                        </div>
+                        <div class="form-group">
+                            <input type="email" id="email" name="email" class="form-input" placeholder=" " required>
+                            <label for="email" class="form-label">E-Mail</label>
+                        </div>
+                        <div class="form-group">
+                            <textarea id="message" name="message" rows="4" class="form-input" placeholder=" " required></textarea>
+                            <label for="message" class="form-label">Nachricht</label>
+                        </div>
+                        <button type="submit" class="submit-btn">Nachricht Senden</button>
+                    </form>
+                </div>
+            </section>
+        </main>
         
-        <section id="projekte">
-            <div class="container reveal">
-                <h2>Ausgewählte Projekte</h2>
-                <div class="project-grid">
-                    <div class="loader"></div>
-                </div>
-            </div>
-        </section>
-
-        <section id="kontakt">
-            <!-- Ersetze die leere <section id="kontakt"> mit dieser -->
-<section id="kontakt">
-    <div class="container reveal">
-        <h2>Kontakt</h2>
-        <p style="text-align:center; max-width: 60ch; margin: 0 auto 3rem auto; color: var(--grey);">
-            Für Anfragen zu Werken, Ausstellungen oder Kooperationen. Ich freue mich, von Ihnen zu hören.
-        </p>
-        <!-- Wir verwenden Formspree für eine einfache, serverlose Funktion -->
-        <form id="contact-form" action="https://formspree.io/f/mldarrjv" method="POST">
-            <div class="form-group">
-                <input type="text" id="name" name="name" class="form-input" placeholder=" " required>
-                <label for="name" class="form-label">Name</label>
-            </div>
-            <div class="form-group">
-                <input type="email" id="email" name="email" class="form-input" placeholder=" " required>
-                <label for="email" class="form-label">E-Mail</label>
-            </div>
-            <div class="form-group">
-                <textarea id="message" name="message" rows="4" class="form-input" placeholder=" " required></textarea>
-                <label for="message" class="form-label">Nachricht</label>
-            </div>
-            <button type="submit" class="submit-btn">Nachricht Senden</button>
-        </form>
-        <p id="form-status"></p> <!-- Für Erfolgs- oder Fehlermeldungen -->
+        <footer>
+            &copy; 2024 Wolfgang Nell | <a href="impressum.html">Impressum</a> | <a href="datenschutz.html">Datenschutz</a>
+        </footer>
     </div>
-</section>
-        </section>
-    </main>
     
     <script src="script.js"></script>
     <script type="module">
@@ -98,7 +97,6 @@
 
       async function displayArtworks() {
         const projectGrid = document.querySelector('.project-grid');
-        // Abfrage holt jetzt auch den Status mit
         const query = `*[_type == "artwork"] | order(_createdAt desc) { title, mainImage, "slug": slug.current, status }`;
         
         try {
@@ -124,16 +122,14 @@
               projectGrid.appendChild(link);
             });
         } catch(error) {
-            projectGrid.innerHTML = '<p style="color:red;">Fehler beim Laden der Projekte. Ist das Backend (Sanity) erreichbar?</p>';
+            projectGrid.innerHTML = '<p style="color:red;">Fehler beim Laden der Projekte.</p>';
             console.error(error);
         }
       }
-
-      // Funktion für den Zähler (optional, falls du sie brauchst)
+      
       function animateCounter() {
           const el = document.getElementById('figure-counter');
           if (!el) return;
-          // Statischer Wert für die Demo, könnte auch aus Sanity kommen
           const target = 4581234;
           let current = 0;
           const step = () => {
@@ -146,9 +142,7 @@
           requestAnimationFrame(step);
       }
       
-      // Starte die Funktionen
       displayArtworks();
-      // Prüfe, ob der Zähler im sichtbaren Bereich ist, um ihn zu starten
       const counterObserver = new IntersectionObserver(entries => {
           if (entries[0].isIntersecting) {
               animateCounter();
@@ -159,11 +153,7 @@
       if(counterEl) {
           counterObserver.observe(counterEl);
       }
-
     </script>
-<!-- ... (dein main und script-Tag) ... -->
-    <footer>
-        &copy; 2024 Wolfgang Nell | <a href="impressum.html">Impressum</a> | <a href="datenschutz.html">Datenschutz</a>
-    </footer>
+    <script src="transitions.js"></script> 
 </body>
 </html>

@@ -86,20 +86,92 @@ h2 { font-size: 3rem; margin-bottom: 3rem; text-align: center; }
 .blog-post-body { margin-top: 1rem; color: var(--grey); }
 .blog-post-body p { margin-bottom: 1rem; }
 
+/* in web-frontend/style.css, ganz am Ende */
+
 /* --- RESPONSIVITÄT --- */
+@media (max-width: 992px) {
+    .vision-container, .artwork-detail-container, .ueber-container {
+        grid-template-columns: 1fr;
+        gap: 2rem;
+        text-align: center;
+    }
+    .ueber-container img {
+        max-width: 300px;
+        margin: 0 auto;
+    }
+    .artwork-info {
+        text-align: left; /* Behält Lesbarkeit auf Detailseite */
+    }
+}
+
 @media (max-width: 768px) {
     body { cursor: auto; }
     .cursor-spotlight { display: none; }
-    header { padding: 1rem; }
-    .nav-links { position: fixed; right: 0; top: 0; height: 100vh; width: 70%; background: #111; flex-direction: column; align-items: center; justify-content: center; transform: translateX(100%); transition: transform 0.5s ease-in-out; }
-    .nav-links.nav-active { transform: translateX(0); }
-    .nav-links a { margin: 2rem 0; }
-    .burger { display: block; z-index: 10002; }
+    
+    section, .page-container {
+        padding: 4rem 1rem;
+    }
+    .page-container {
+        padding-top: 10vh;
+    }
+
+    h1 { font-size: 2.5rem; }
+    h2 { font-size: 2rem; }
+    
+    header {
+        padding: 1rem;
+    }
+    .nav-links {
+        position: fixed;
+        right: 0;
+        top: 0;
+        height: 100vh;
+        width: 80%; /* Etwas breiter für bessere Touch-Ziele */
+        max-width: 300px;
+        background: #111;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center; /* Zentriert die Links */
+        transform: translateX(100%);
+        transition: transform 0.5s ease-in-out;
+    }
+    .nav-links.nav-active {
+        transform: translateX(0);
+    }
+    .nav-links a {
+        margin: 2rem 0;
+        font-size: 1.2rem;
+        opacity: 0; /* Für die Animation */
+    }
+    /* Coole Animation für die Menü-Links */
+    .nav-links.nav-active a {
+        animation: navLinkFade 0.5s ease forwards 0.3s;
+    }
+    @keyframes navLinkFade {
+        from { opacity: 0; transform: translateX(50px); }
+        to { opacity: 1; transform: translateX(0); }
+    }
+    .burger {
+        display: block;
+        z-index: 10002;
+        padding: 10px; /* Macht den Klickbereich größer */
+        position: relative; /* Wichtig für z-index */
+    }
     .burger.toggle .line1 { transform: rotate(-45deg) translate(-5px, 6px); }
     .burger.toggle .line2 { opacity: 0; }
     .burger.toggle .line3 { transform: rotate(45deg) translate(-5px, -6px); }
-    .page-container { padding-top: 10vh; }
-    .vision-container, .artwork-detail-container, .ueber-container { grid-template-columns: 1fr; }
+    
+    /* Besseres Layout für Vision-Sektion */
+    .vision-container { text-align: center; }
+    .vision-text { margin-top: 2rem; }
+    .counter-container h2 { font-size: 4rem; }
+    
+    /* Besseres Layout für Projekt-Detailseite */
+    .artwork-info h1 { font-size: 2rem; }
+    .artwork-poem { margin: 1.5rem 0; }
+    
+    /* Besseres Layout für Blog-Seiten */
+    .blog-post-detail h1 { font-size: 2.2rem; }
 }
 
 /* --- NEUE STILE FÜR BLOG & DETAILSEITEN --- */
