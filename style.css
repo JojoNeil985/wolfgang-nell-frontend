@@ -6,6 +6,10 @@
 }
 
 * { margin: 0; padding: 0; box-sizing: border-box; }
+/* FIX FÜR HORIZONTALEN SCROLL AUF MOBILGERÄTEN */
+html, body {
+    overflow-x: hidden;
+}
 html { scroll-behavior: smooth; }
 body {
     background-color: var(--black);
